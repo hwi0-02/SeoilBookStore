@@ -1,0 +1,152 @@
+@charset "UTF-8";
+
+body {
+    font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+.orders-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #eee;
+}
+
+.empty-orders {
+    text-align: center;
+    padding: 50px 0;
+    color: #888;
+}
+
+.order-group {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    overflow: hidden; /* for border-radius to apply to child elements */
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.order-group-header {
+    background-color: #f7f7f7;
+    padding: 12px 20px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-date {
+    font-size: 18px;
+    font-weight: bold;
+    color: #555;
+}
+
+.order-transaction-id {
+    font-size: 14px;
+    color: #777;
+}
+
+.order-items-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.order-items-table th, .order-items-table td {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.order-items-table th {
+    background-color: #fafafa;
+    font-weight: 600;
+    color: #666;
+    font-size: 14px;
+}
+
+.order-items-table td {
+    vertical-align: middle;
+    font-size: 15px;
+}
+
+.item-info {
+    display: flex;
+    align-items: center;
+}
+
+.item-info img {
+    width: 70px;
+    height: auto;
+    margin-right: 15px;
+    border-radius: 4px;
+    border: 1px solid #eee;
+}
+
+.item-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.item-author {
+    font-size: 13px;
+    color: #888;
+}
+
+.order-group-footer {
+    background-color: #f7f7f7;
+    padding: 15px 20px;
+    text-align: right;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.total-price {
+    color: #d9534f; /* A shade of red */
+    margin-left: 10px;
+}
+
+.back-button-fixed {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: #ffffff; /* White background */
+    color: #000000; /* Black arrow */
+    border: 1px solid #e0e0e0; /* Subtle border */
+    border-radius: 50%;
+    font-size: 1.9em; /* Adjusted for natural look */
+    font-weight: normal; /* Thinner, more natural stroke */
+    line-height: 1; /* Ensure vertical centering */
+    padding-right: 2px; /* Adjust for visual centering */
+    text-decoration: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.back-button-fixed:hover {
+    background-color: #f0f0f0; /* Slightly gray on hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-1px); /* Apply hover effect */
+}

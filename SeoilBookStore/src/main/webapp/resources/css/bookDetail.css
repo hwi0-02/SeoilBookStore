@@ -1,0 +1,309 @@
+body {
+    font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+    margin: 0;
+    padding: 40px 20px;
+    background-color: #f0f2f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* 공통 컨테이너 스타일 통일 */
+.book-container,
+.book-description,
+.review-container {
+    max-width: 1000px; /* 동일한 최대 너비 */
+    margin: 40px auto; /* 위/아래 40px, 좌우 가운데 정렬 */
+    padding: 40px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+/* 책 상세 컨테이너 */
+.book-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+}
+
+.cover {
+    flex: 0 0 280px;
+    text-align: center;
+}
+
+.cover img {
+    width: 100%;
+    max-width: 300px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: opacity 0.3s;
+}
+
+.cover img.loading {
+    opacity: 0.5;
+}
+
+.info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.info h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #222;
+}
+
+.author {
+    font-size: 1.15rem;
+    color: #666;
+    margin-bottom: 12px;
+}
+
+.price {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #e74c3c;
+    margin-bottom: 24px;
+}
+
+.buttons {
+    margin-top: auto;
+    display: flex;
+    gap: 12px;
+}
+
+.buttons button, .buttons a {
+    flex: 1;
+    padding: 14px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 1px solid #007bff;
+    background-color: #fff;
+    color: #007bff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.buttons button:hover, .buttons a:hover {
+    background-color: #f0f8ff;
+}
+
+.buttons .buy-now {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.buttons .buy-now:hover {
+    background-color: #0056b3;
+}
+
+.buttons form {
+    flex: 1;
+    display: block;
+}
+
+.buttons form button {
+    width: 100%;
+}
+
+.back-button {
+    display: block;
+    width: 150px;
+    margin: 30px auto;
+    padding: 12px;
+    text-align: center;
+    background-color: #6c757d;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.back-button:hover {
+    background-color: #5a6268;
+}
+
+.buttons .out-of-stock {
+    background-color: #dc3545;
+    color: #fff;
+    cursor: not-allowed;
+    border: 1px solid #dc3545;
+}
+
+.buttons .out-of-stock:hover {
+    background-color: #c82333;
+}
+
+/* 책 내용 컨테이너 */
+.book-description .description {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #444;
+}
+
+/* 평균 별점 영역 */
+.rating-section {
+    margin-bottom: 20px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rating-section .stars {
+    color: #e74c3c;
+    font-size: 22px;
+}
+
+.rating-section .rating-text {
+    font-size: 16px;
+    color: #555;
+}
+
+/* 리뷰 작성 폼 */
+.review-form {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+}
+
+.review-form .form-group {
+    margin-bottom: 15px;
+}
+
+.review-form label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+}
+.star-rating {
+    display: flex;
+    gap: 5px;
+}
+
+.star-rating span {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background: #c0c0c0;        /* 별 내부 흰색 */
+    border: 2px solid black;  /* 별 테두리 검정색 */
+    clip-path: polygon(
+        50% 0%,
+        61% 35%,
+        98% 35%,
+        68% 57%,
+        79% 91%,
+        50% 70%,
+        21% 91%,
+        32% 57%,
+        2% 35%,
+        39% 35%
+    ); /* 별 모양 */
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.star-rating span.filled {
+    background: #e74c3c; /* 채워진 별 색 */
+}
+.review-form input[type="text"],
+.review-form select,
+.review-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.review-form textarea {
+    resize: none;
+}
+
+.review-form .btn-right {
+    text-align: right;
+}
+
+.review-form .btn-submit {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.2s;
+}
+
+.review-form .btn-submit:hover {
+    background-color: #0056b3;
+}
+/* 리뷰 리스트 */
+.review-list {
+    margin-top: 20px;
+}
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+.review-item {
+    background: #fafafa;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.review-stars {
+    color: #e74c3c;
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.review-content {
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+.review-meta {
+    font-size: 13px;
+    color: #888;
+}
+.back-button-fixed {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: #ffffff; /* White background */
+    color: #000000; /* Black arrow */
+    border: 1px solid #e0e0e0; /* Subtle border */
+    border-radius: 50%;
+    font-size: 1.9em; /* Adjusted for natural look */
+    font-weight: normal; /* Thinner, more natural stroke */
+    line-height: 1; /* Ensure vertical centering */
+    padding-right: 2px; /* Adjust for visual centering */
+    text-decoration: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.back-button-fixed:hover {
+    background-color: #f0f0f0; /* Slightly gray on hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-1px); /* Apply hover effect */
+}

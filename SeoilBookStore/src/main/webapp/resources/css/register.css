@@ -1,0 +1,113 @@
+body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f0f2f5; /* Light gray background */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .register-container {
+            background-color: #fff;
+            border-radius: 16px; /* More rounded */
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08); /* Modern shadow */
+            padding: 40px; /* More padding */
+            width: 100%;
+            max-width: 420px; /* Slightly wider */
+        }
+        
+        h2 {
+            text-align: center;
+            margin-bottom: 35px; /* More margin */
+            color: #222;
+            font-size: 2em; /* Larger heading */
+        }
+        
+        .form-group {
+            margin-bottom: 25px; /* More margin */
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px; /* More margin */
+            font-weight: 600;
+            color: #444;
+            font-size: 0.95em;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px; /* More padding */
+            border: 1px solid #ced4da; /* Lighter border */
+            border-radius: 8px; /* More rounded */
+            font-size: 1em;
+            box-sizing: border-box; /* Include padding in width */
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px; /* More padding */
+            background-color: #007bff; /* Modern blue */
+            color: #fff;
+            border: none;
+            border-radius: 8px; /* More rounded */
+            font-size: 1.1em; /* Larger font */
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+        }
+        
+        button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+            box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3);
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 30px; /* More margin */
+            font-size: 0.95em;
+            color: #666;
+        }
+        
+        .login-link a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            color: #dc3545; /* Red color */
+            font-size: 0.9em;
+            margin-top: 10px; /* More margin */
+            text-align: left; /* Align left for form errors */
+        }
+        
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 25px; /* More margin */
+        }
+        
+        .back-link a {
+            color: #6c757d; /* Gray color */
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }

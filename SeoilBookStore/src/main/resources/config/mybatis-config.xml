@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+  
+  <!-- 1. 로그 출력 설정 (개발 중 SQL 로그 확인 용도) -->
+  <settings>
+    <setting name="logImpl" value="STDOUT_LOGGING"/>
+    <setting name="callSettersOnNulls" value="true"/>
+    <setting name="jdbcTypeForNull" value="NULL"/>
+    <setting name="mapUnderscoreToCamelCase" value="true"/>
+  </settings>
+
+  <!-- 2. Alias 설정 (패키지명을 생략하고 클래스명으로 사용할 수 있음) -->
+  <typeAliases>
+    <package name="model"/>
+  </typeAliases>
+
+
+</configuration>
