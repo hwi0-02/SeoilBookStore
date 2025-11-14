@@ -8,7 +8,6 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,13 +17,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttribute;
 
 import mapper.ReviewMapper;
 import model.Book;
 import model.Member;
 import model.Review;
-import service.AdminService;
 import service.BookService;
 import service.MemberService;
 
@@ -37,9 +34,6 @@ public class BookController {
 	
 	@Autowired
 	private MemberService memberService;
-	
-	@Autowired
-	private AdminService adminService;
 	
 	@Autowired
 	private ReviewMapper reviewMapper;
@@ -60,7 +54,7 @@ public class BookController {
 
 	@GetMapping("/books/{id}")
 	public String viewBook(@PathVariable("id") int id, Model model, HttpSession session) {
-		Member loginUser = (Member)session.getAttribute("loginUser");
+		Member loginUser = getLoginUser(session);
 		model.addAttribute("loginUser", loginUser);
 		
 		Book book = bookService.getBookById(id);
@@ -126,8 +120,8 @@ public class BookController {
 	        return "redirect:/books";
 	    }
 
-	    // [CHANGED] 세션에서 직접 꺼내서 null 방어
-	    Member loginUser = (Member) session.getAttribute("loginUser");
+	    // 세션에서 바로 회원 정보를 꺼내 null 여부 확인
+	    Member loginUser = getLoginUser(session);
 	    if (loginUser == null) {
 	        ra.addFlashAttribute("successMsg", "로그인이 필요합니다.");
 	        return "redirect:/books/" + finalBookId;
@@ -151,7 +145,7 @@ public class BookController {
 	@GetMapping("/recommended")
 	public String recommended(org.springframework.ui.Model model,
 	                          javax.servlet.http.HttpSession session) {
-	    Member loginUser = (Member) session.getAttribute("loginUser");
+	    Member loginUser = getLoginUser(session);
 	    model.addAttribute("loginUser", loginUser);
 
 	    List<Book> top5 = bookService.getRecommendedTopN(5);
@@ -173,7 +167,7 @@ public class BookController {
 	                     javax.servlet.http.HttpSession session,
 	                     org.springframework.web.servlet.mvc.support.RedirectAttributes ra) {
 
-	    Member loginUser = (Member) session.getAttribute("loginUser");
+	    Member loginUser = getLoginUser(session);
 	    if (loginUser == null) {
 	        ra.addFlashAttribute("successMsg", "로그인이 필요합니다.");
 	        return (review.getBookId() != 0) ? "redirect:/books/" + review.getBookId() : "redirect:/books";
@@ -209,7 +203,7 @@ public class BookController {
 
 	    Map<String,Object> res = new HashMap<>();
 	    try {
-	        Member loginUser = (Member) session.getAttribute("loginUser");
+	        Member loginUser = getLoginUser(session);
 	        if (loginUser == null) throw new RuntimeException("로그인이 필요합니다.");
 
 	        Review origin = bookService.getReviewById(id);
@@ -228,6 +222,10 @@ public class BookController {
 	        res.put("message", e.getMessage());
 	    }
 	    return res;
+	}
+
+	private Member getLoginUser(HttpSession session) {
+		return (Member) session.getAttribute("loginUser");
 	}
 	
 }

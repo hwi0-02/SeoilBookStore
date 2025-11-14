@@ -73,7 +73,7 @@ public class BookService {
         // DB 레벨 권한검증을 위해 memberId 세팅
         Review toUpdate = new Review();
         toUpdate.setId(origin.getId());
-        toUpdate.setMemberId(origin.getMemberId());  // ⭐ 소유자 고정
+        toUpdate.setMemberId(origin.getMemberId());  // 소유자 고정
         toUpdate.setContent(newContent);
         toUpdate.setScore(newScore);
 

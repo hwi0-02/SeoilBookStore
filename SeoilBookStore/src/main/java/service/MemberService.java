@@ -2,6 +2,7 @@
 package service;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,19 +18,11 @@ public class MemberService {
     private MemberMapper memberMapper;
 
     public Member login(String userId, String password) {
-        Member m = memberMapper.selectByUserId(userId);
-        if (m != null && m.getPassword().equals(password)) {
-            return m;
-        }
-        return null;
+        return authenticate(() -> memberMapper.selectByUserId(userId), password);
     }
 
     public Member loginById(int id, String password) {
-        Member m = memberMapper.selectById(id);
-        if (m != null && m.getPassword().equals(password)) {
-            return m;
-        }
-        return null;
+        return authenticate(() -> memberMapper.selectById(id), password);
     }
 
     public Member selectByUserId(String userId) {
@@ -49,18 +42,15 @@ public class MemberService {
     }
 
     public List<Member> searchMembers(String keyword) {
-        // 키워드로 회원 검색: keyword가 null이거나 빈 문자열일 경우 전체 조회도 고려 가능
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return getAllMembers();
-        }
-        return memberMapper.searchByKeyword(keyword);
+        return hasText(keyword) ? memberMapper.searchByKeyword(keyword.trim()) : getAllMembers();
     }
     
     public List<Member> searchMembersByFilters(String name, String userId, String startDate, String endDate) {
         return memberMapper.searchByFilters(
-            name==null?null:name.trim(),
-            userId==null?null:userId.trim(),
-            startDate, endDate
+            trimOrNull(name),
+            trimOrNull(userId),
+            startDate,
+            endDate
         );
     }
     
@@ -87,5 +77,18 @@ public class MemberService {
 
     public boolean removeById(int id) {
         return memberMapper.deleteById(id) > 0;
+    }
+
+    private Member authenticate(Supplier<Member> finder, String password) {
+        Member member = finder.get();
+        return (member != null && member.getPassword().equals(password)) ? member : null;
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
+    private String trimOrNull(String value) {
+        return hasText(value) ? value.trim() : null;
     }
 }

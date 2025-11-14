@@ -29,40 +29,33 @@ public class MemberController {
     @Autowired
     private OrderService orderService;
 
-    @GetMapping("/loginform")
+    @GetMapping({"/loginform", "/login"})
     public String loginForm() {
-        return "user/login"; // /WEB-INF/views/user/login.jsp
-    }
-
-    @GetMapping("/login")
-    public String loginPage() {
-        return "user/login"; // /WEB-INF/views/user/login.jsp
+        return "user/login";
     }
 
     @GetMapping("/registerform")
     public String registerForm() {
-        return "user/register"; // /WEB-INF/views/user/register.jsp
+        return "user/register";
     }
 
     @GetMapping("/info")
     public String memberInfo(HttpSession session, Model model) {
-        Member loginUser = (Member) session.getAttribute("loginUser");
-
+        Member loginUser = getLoginUser(session);
         if (loginUser == null) {
-            // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
-            return "redirect:/member/loginform";
+            return redirectToLogin();
         }
         model.addAttribute("member", loginUser);
         model.addAttribute("orders", orderService.getOrdersByMemberId(loginUser.getId()));
-        return "user/info"; // /WEB-INF/views/user/info.jsp
+        return "user/info";
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam("userId") String userId, // [수정] id → userId로 변경
+    public String login(@RequestParam("userId") String userId,
                         @RequestParam("password") String password,
                         HttpSession session, RedirectAttributes redirectAttributes) {
 
-        Member member = memberService.login(userId, password); // [수정] int id → String userId
+        Member member = memberService.login(userId, password);
         if (member != null) {
             session.setAttribute("loginUser", member);
             return "redirect:/books";
@@ -85,25 +78,16 @@ public class MemberController {
     }
 
     @PostMapping("/join")
-    public String join(@RequestParam("userId") String userId,  // 회원가입에서는 문자열 아이디 사용(userId)
+    public String join(@RequestParam("userId") String userId,
                        @RequestParam("password") String password,
                        @RequestParam("name") String name,
                        @RequestParam("phone") String phone,
                        @RequestParam("address") String address,
                        RedirectAttributes redirectAttributes) {
-        // 아이디 중복 확인
         if (memberService.selectByUserId(userId) != null) {
             redirectAttributes.addFlashAttribute("idError", "이미 존재하는 아이디입니다.");
             return "redirect:/member/registerform";
         }
-
-        /*
-         * // 이메일 중복 확인 if (memberService.selectByEmail(email) != null) {
-         * redirectAttributes.addFlashAttribute("emailError", "이미 사용 중인 이메일입니다.");
-         * return "redirect:/member/registerform"; }
-         */
-
-        // 전화번호 중복 확인
         if (memberService.selectByPhone(phone) != null) {
             redirectAttributes.addFlashAttribute("phoneError", "이미 사용 중인 전화번호입니다.");
             return "redirect:/member/registerform";
@@ -135,31 +119,28 @@ public class MemberController {
 
     @PostMapping("/delete")
     @ResponseBody
-    public boolean remove(@RequestParam("userId") String userId) {  // [수정] id → userId로 변경
-        return memberService.remove(userId); // [수정] int id → String userId
+    public boolean remove(@RequestParam("userId") String userId) {
+        return memberService.remove(userId);
     }
     
-    // 수정 폼 보여주기
     @GetMapping("/editinfo")
     public String editInfo(HttpSession session, Model model) {
-        Member loginUser = (Member) session.getAttribute("loginUser");
+        Member loginUser = getLoginUser(session);
         if (loginUser == null) {
-            return "redirect:/member/loginform";
+            return redirectToLogin();
         }
         model.addAttribute("member", loginUser);
-        return "user/editinfo"; // JSP 페이지 경로
+        return "user/editinfo";
     }
     
-    // 폼 제출 처리
     @PostMapping("/editinfo")
     public String update(Member member, HttpSession session, RedirectAttributes redirectAttributes) {
-        Member loginUser = (Member) session.getAttribute("loginUser");
+        Member loginUser = getLoginUser(session);
         if (loginUser == null) {
-            return "redirect:/member/loginform";
+            return redirectToLogin();
         }
         member.setUserId(loginUser.getUserId());
 
-        // 기존 비밀번호를 다시 세팅 (폼에서 password를 안 받으므로 null임)
         member.setPassword(loginUser.getPassword());
 
         boolean success = memberService.modify(member);
@@ -172,5 +153,13 @@ public class MemberController {
             redirectAttributes.addFlashAttribute("errorMsg", "회원 정보 수정에 실패했습니다. 다시 시도해주세요.");
             return "redirect:/member/editinfo";
         }
+    }
+
+    private Member getLoginUser(HttpSession session) {
+        return (Member) session.getAttribute("loginUser");
+    }
+
+    private String redirectToLogin() {
+        return "redirect:/member/loginform";
     }
 }

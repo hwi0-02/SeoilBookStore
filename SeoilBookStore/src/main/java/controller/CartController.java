@@ -51,7 +51,6 @@ public class CartController {
             return "redirect:/books";
         }
         
-        // Service 기능
         Map<Integer, CartItem> cartMap = getCartMap(session);
         
         if (cartMap.containsKey(bookId)) {
@@ -62,9 +61,6 @@ public class CartController {
             newbook.setQuantity(1);
         	cartMap.put(bookId, newbook);
         }
-        // 여기까지
-        
-        
         session.setAttribute("cart", cartMap);
         
         return "redirect:/cart";
@@ -77,7 +73,6 @@ public class CartController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
         
-    	// Service 기능
         Map<Integer, CartItem> cartMap = getCartMap(session);
         
         if (cartMap.containsKey(bookId)) {
@@ -95,8 +90,6 @@ public class CartController {
             	}
             }
         }
-        // 여기까지
-        
         session.setAttribute("cart", cartMap);
         
         return "redirect:/cart";

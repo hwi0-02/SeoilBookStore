@@ -61,7 +61,7 @@ public interface ReviewMapper {
     @Select("SELECT NVL(AVG(score), 0) FROM review")
     double selectGlobalAvgScore();
 
-    // ★ 추가: 리뷰 수 Top N (기간/제목/저자 필터)
+    // 기간·제목·저자 필터를 반영한 리뷰 수 Top N 조회
     @Select({
         "<script>",
         "SELECT * FROM (",

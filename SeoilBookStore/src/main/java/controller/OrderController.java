@@ -36,14 +36,13 @@ public class OrderController {
 	@Autowired
 	private BookService bookService;
 
-	// ✅ [1] 특정 회원 주문 내역 조회
+	// 회원 주문 내역 조회
 	@GetMapping("/member/orderlist")
 	public String getOrdersByMemberId(HttpSession session, Model model) {
-		Member loginUser = (Member) session.getAttribute("loginUser");
-        if (loginUser == null) {
-            // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
-            return "redirect:/member/loginform";
-        }
+		Member loginUser = getLoginUser(session);
+		if (loginUser == null) {
+			return "redirect:/member/loginform";
+		}
 		List<Order> orderList = orderService.getOrdersByMemberId(loginUser.getId());
 		Map<String, List<Order>> groupedOrders = orderList.stream()
 			    .collect(Collectors.groupingBy(
@@ -55,7 +54,7 @@ public class OrderController {
 		return "user/member_orders"; // → /WEB-INF/views/order/member_orders.jsp
 	}
 
-	// ✅ [3] 주문 등록 처리
+	// 주문 등록 처리
 	@PostMapping("/insert")
 	public String insertOrder(@ModelAttribute Order order) {
 		orderService.insertOrder(order);
@@ -65,7 +64,7 @@ public class OrderController {
 	@PostMapping("/buyNow")
 	public String buyNow(@RequestParam("bookId") int bookId, @RequestParam("quantity") int quantity,
 			HttpSession session, RedirectAttributes redirectAttributes) {
-		Member loginUser = (Member) session.getAttribute("loginUser");
+		Member loginUser = getLoginUser(session);
 		if (loginUser == null) {
 			return "redirect:/member/loginform";
 		}
@@ -98,9 +97,10 @@ public class OrderController {
 		return "redirect:/orders/payment"; 
 	}
 
+	@SuppressWarnings("unchecked")
 	@PostMapping("/checkout")
 	public String checkout(HttpSession session, RedirectAttributes redirectAttributes) {
-		Member loginUser = (Member) session.getAttribute("loginUser");
+		Member loginUser = getLoginUser(session);
 		if (loginUser == null) {
 			return "redirect:/member/loginform";
 		}
@@ -129,11 +129,12 @@ public class OrderController {
 		return "redirect:/orders/payment";
 	}
 	
+	@SuppressWarnings("unchecked")
 	@GetMapping("/payment")
 	public String showPaymentPage(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
 		Order order = (Order) session.getAttribute("order");
 		List<Order> orders = (List<Order>) session.getAttribute("orders");
-		Member loginUser = (Member) session.getAttribute("loginUser");
+		Member loginUser = getLoginUser(session);
 
 		if ((order == null && (orders == null || orders.isEmpty())) || loginUser == null) {
 			redirectAttributes.addFlashAttribute("errorMsg", "주문 또는 사용자 정보가 없습니다.");
@@ -157,9 +158,10 @@ public class OrderController {
 		return "user/payment";
 	}
 
+	@SuppressWarnings("unchecked")
 	@PostMapping("/confirm")
 	public String confirmOrder(HttpSession session, RedirectAttributes redirectAttributes) {
-		Member loginUser = (Member) session.getAttribute("loginUser");
+		Member loginUser = getLoginUser(session);
 		if (loginUser == null) {
 			return "redirect:/member/loginform";
 		}
@@ -224,4 +226,8 @@ public class OrderController {
         session.removeAttribute("order");
         session.removeAttribute("orders");
      }
+
+	private Member getLoginUser(HttpSession session) {
+		return (Member) session.getAttribute("loginUser");
+	}
 }

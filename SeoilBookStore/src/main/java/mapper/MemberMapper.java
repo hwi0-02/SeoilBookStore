@@ -14,11 +14,9 @@ import model.Member;
 @Mapper
 public interface MemberMapper {
 
-	// 추가: id 기준 조회 (userId 외에 숫자 id도 로그인/조회 시 활용 가능)
 	@Select("SELECT * FROM member WHERE id = #{id}")
-	Member selectById(int id); // 추가: 숫자 id 기준 조회
+  Member selectById(int id);
 
-	// 수정: userId 기준 조회로 변경
 	@Select("SELECT * FROM member WHERE user_id = #{userId}")
 	Member selectByUserId(String userId);
 
@@ -29,20 +27,16 @@ public interface MemberMapper {
 			+ "VALUES (MEMBER_SEQ.NEXTVAL, #{userId}, #{password}, #{name}, #{phone}, #{address}, CURRENT_DATE, 'USER')")
 	int insert(Member member);
 
-	// 추가: userId 기준으로 수정
 	@Update("UPDATE member SET password = #{password}, "
 			+ "name = #{name}, phone = #{phone}, address = #{address} WHERE user_id = #{userId}")
 	int update(Member member);
 
-	// 기존: id 기준 수정
 	@Update("UPDATE member SET password = #{password}, name = #{name}, phone = #{phone}, address = #{address} WHERE id = #{id}")
 	int updateById(Member member);
 
-	// 수정: userId 기준 삭제
 	@Delete("DELETE FROM member WHERE user_id = #{userId}")
-	int delete(String userId); // 수정: int id → String userId
+  int delete(String userId);
 
-	// 기존: id 기준 삭제
 	@Delete("DELETE FROM member WHERE id = #{id}")
 	int deleteById(int id);
 
@@ -54,7 +48,7 @@ public interface MemberMapper {
             "   OR user_id LIKE '%' || #{keyword} || '%'")
     List<Member> searchByKeyword(String keyword);
     
- // [ADDED] 이름/아이디/가입기간 필터 검색 (Oracle)
+	// 이름, 아이디, 가입 기간 조건 검색
     @Select({
       "<script>",
       "SELECT *",
@@ -86,7 +80,7 @@ public interface MemberMapper {
       @Param("endDate") String endDate       // yyyy-MM-dd
     );
     
- // [ADDED] 가입자 통계(연/월/일) + 기간 필터
+	// 가입자 통계를 연·월·일 단위로 집계
     @Select({
       "<script>",
       "SELECT label, COUNT(*) AS count",

@@ -39,21 +39,7 @@ public class AdminService {
     }
 
     public void save(Book book, MultipartFile file) {
-        if (file != null && !file.isEmpty()) {
-            String path = servletContext.getRealPath("/resources/images/");
-            String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            book.setImage(filename);
-            File uploadDir = new File(path);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
-            String fullname = path + File.separator + filename;
-            try {
-                file.transferTo(new File(fullname));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        handleImageUpload(book, file, null);
         adminMapper.save(book);
     }
 
@@ -62,21 +48,7 @@ public class AdminService {
     }
 
     public void update(Book book, MultipartFile file) {
-        if (file != null && !file.isEmpty()) {
-            String path = servletContext.getRealPath("/resources/images/");
-            String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            book.setImage(filename);
-            File uploadDir = new File(path);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
-            String fullname = path + File.separator + filename;
-            try {
-                file.transferTo(new File(fullname));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        handleImageUpload(book, file, book.getImage());
         adminMapper.update(book);
     }
 
@@ -89,12 +61,35 @@ public class AdminService {
         return orderMapper.selectTopBookSales(startDate, endDate, limit, title, author);
     }
 
-    // ★ 추가: 리뷰 수 Top N
+    // 리뷰 수 기준 Top N 도서 집계
     public List<StatPoint> getTopBookReviewCount(String startDate, String endDate, Integer limit, String title, String author) {
         return reviewMapper.selectTopBookReviewCount(startDate, endDate, limit, title, author);
     }
 
     public List<Book> searchBooksByTitleAuthor(String title, String author) {
         return adminMapper.searchBooksByTitleAuthor(title, author);
+    }
+
+    private void handleImageUpload(Book book, MultipartFile file, String fallbackImage) {
+        if (file == null || file.isEmpty()) {
+            if (fallbackImage != null) {
+                book.setImage(fallbackImage);
+            }
+            return;
+        }
+
+        String path = servletContext.getRealPath("/resources/images/");
+        String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        book.setImage(filename);
+        File uploadDir = new File(path);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+        File destination = new File(path + File.separator + filename);
+        try {
+            file.transferTo(destination);
+        } catch (Exception e) {
+            throw new IllegalStateException("이미지 업로드에 실패했습니다.", e);
+        }
     }
 }

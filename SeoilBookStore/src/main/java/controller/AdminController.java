@@ -18,7 +18,7 @@ import model.Book;
 import model.Member;
 import model.Order;
 import model.Review;
-import model.StatPoint;// ★ (선택) 명시 임포트
+import model.StatPoint;
 import service.AdminService;
 import service.BookService;
 import service.MemberService;
@@ -37,51 +37,31 @@ public class AdminController {
     public ModelAndView adminMainlist(
             ModelAndView mv,
             @RequestParam(value = "keyword",   required = false) String keyword,
-            @RequestParam(value = "startDate", required = false) String startDate, // yyyy-MM-dd
-            @RequestParam(value = "endDate",   required = false) String endDate,   // yyyy-MM-dd
-            @RequestParam(value = "limit",     required = false) Integer limit,    // Top N
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate",   required = false) String endDate,
+            @RequestParam(value = "limit",     required = false) Integer limit,
             @RequestParam(value = "title",     required = false) String title,
             @RequestParam(value = "author",    required = false) String author,
-            @RequestParam(value = "metric",    required = false, defaultValue = "sales") String metric // ★ 추가
+            @RequestParam(value = "metric",    required = false, defaultValue = "sales") String metric
     ) {
-        // 리스트 조회(기존 로직 유지)
-        List<Book> books;
-        if ((title != null && !title.trim().isEmpty()) ||
-            (author != null && !author.trim().isEmpty())) {
-            books = adminservice.searchBooksByTitleAuthor(title, author);
-        } else if (keyword != null && !keyword.trim().isEmpty()) {
-            books = adminservice.searchBooks(keyword);
-        } else {
-            books = adminservice.getBookList();
-        }
-        mv.addObject("books", books);
+        mv.addObject("books", resolveBookList(keyword, title, author));
         mv.addObject("keyword", keyword);
 
-        
-        List<StatPoint> chartStats;
-        if ("reviews".equalsIgnoreCase(metric)) {
-            chartStats = adminservice.getTopBookReviewCount(startDate, endDate, limit, title, author);
-        } else {
-            chartStats = adminservice.getTopBookSales(startDate, endDate, limit, title, author);
-            metric = "sales"; // 방어적 정규화
-        }
-        // JSP 호환 위해 기존 키 'bookSalesStats' 유지 사용
-        mv.addObject("bookSalesStats", chartStats);  
-        mv.addObject("chartMetric", metric);         // ← JSP에서 라벨/제목 바꾸고 싶을 때 사용할 수 있음
-        mv.addObject("chartMetricLabel", "reviews".equals(metric) ? "리뷰 수" : "판매 수량"); // (옵션)
+        boolean reviewsMetric = "reviews".equalsIgnoreCase(metric);
+        List<StatPoint> chartStats = reviewsMetric
+                ? adminservice.getTopBookReviewCount(startDate, endDate, limit, title, author)
+                : adminservice.getTopBookSales(startDate, endDate, limit, title, author);
+        String normalizedMetric = reviewsMetric ? "reviews" : "sales";
+        mv.addObject("bookSalesStats", chartStats);
+        mv.addObject("chartMetric", normalizedMetric);
+        mv.addObject("chartMetricLabel", reviewsMetric ? "리뷰 수" : "판매 수량");
 
-        // 입력값 유지(기존)
-        mv.addObject("paramStartDate", startDate == null ? "" : startDate);
-        mv.addObject("paramEndDate",   endDate   == null ? "" : endDate);
+        mv.addObject("paramStartDate", safeValue(startDate));
+        mv.addObject("paramEndDate", safeValue(endDate));
         mv.addObject("title", title);
         mv.addObject("author", author);
-        mv.addObject("paramMetric", metric);
-
-        if (limit == null) {
-            mv.addObject("paramLimit", "");
-        } else {
-            mv.addObject("paramLimit", limit);
-        }
+        mv.addObject("paramMetric", normalizedMetric);
+        mv.addObject("paramLimit", limit == null ? "" : limit);
 
         mv.setViewName("admin/adminbooklist");
         mv.addObject("page", "books");
@@ -89,7 +69,9 @@ public class AdminController {
     }
 
     @RequestMapping("addbook")
-    public String addBook() { return "admin/addbookform"; }
+    public String addBook() {
+        return "admin/addbookform";
+    }
 
     @PostMapping("save")
     public String save(@RequestParam("title") String title,
@@ -173,7 +155,7 @@ public class AdminController {
         return "redirect:/admin/books";
     }
 
-    // ===== 멤버/주문 이하 기존 그대로 =====
+    // ===== 멤버 관리 =====
 
     @RequestMapping("adminmemberlist")
     public ModelAndView adminMemberlist(ModelAndView mv,
@@ -182,20 +164,17 @@ public class AdminController {
             @RequestParam(value = "startDate", required = false) String startDate,
             @RequestParam(value = "endDate",   required = false) String endDate,
             @RequestParam(value = "period",    required = false, defaultValue = "day") String period) {
-        if ((name == null || name.isBlank()) &&
-            (userId == null || userId.isBlank()) &&
-            (startDate == null || startDate.isBlank()) &&
-            (endDate == null || endDate.isBlank())) {
+        if (!hasText(name) && !hasText(userId) && !hasText(startDate) && !hasText(endDate)) {
             mv.addObject("members", memberservice.getAllMembers());
         } else {
             mv.addObject("members", memberservice.searchMembersByFilters(name, userId, startDate, endDate));
         }
         mv.addObject("signupStats", memberservice.getSignupStats(startDate, endDate, period));
         mv.addObject("period", period);
-        mv.addObject("paramName", name == null ? "" : name);
-        mv.addObject("paramUserId", userId == null ? "" : userId);
-        mv.addObject("paramStartDate", startDate == null ? "" : startDate);
-        mv.addObject("paramEndDate", endDate == null ? "" : endDate);
+        mv.addObject("paramName", safeValue(name));
+        mv.addObject("paramUserId", safeValue(userId));
+        mv.addObject("paramStartDate", safeValue(startDate));
+        mv.addObject("paramEndDate", safeValue(endDate));
         mv.addObject("page", "members");
         mv.setViewName("admin/adminmemberlist");
         return mv;
@@ -232,6 +211,8 @@ public class AdminController {
         return "redirect:/admin/adminmemberlist";
     }
 
+    // ===== 주문 관리 =====
+
     @RequestMapping("adminorderlist")
     public ModelAndView adminOrderlist(
             ModelAndView mv,
@@ -241,18 +222,18 @@ public class AdminController {
             @RequestParam(value = "endDate",       required = false) String endDate,
             @RequestParam(value = "period",        required = false, defaultValue = "day") String period) {
         List<Order> orders = orderservice.searchOrdersByFilters(transactionId, memberName, startDate, endDate);
-        Map<String, List<Order>> groupedOrders = new LinkedHashMap<>();
-        for (Order order : orders) {
-            groupedOrders.computeIfAbsent(order.getTransactionId(), k -> new ArrayList<>()).add(order);
-        }
+        Map<String, List<Order>> groupedOrders = orders.stream()
+                .collect(LinkedHashMap::new,
+                        (map, order) -> map.computeIfAbsent(order.getTransactionId(), k -> new ArrayList<>()).add(order),
+                        Map::putAll);
         mv.addObject("orderStats", orderservice.getOrderStats(transactionId, memberName, startDate, endDate, period));
         mv.addObject("groupedOrders", groupedOrders);
         mv.addObject("period", period);
         mv.addObject("page", "orders");
-        mv.addObject("paramTransactionId", transactionId == null ? "" : transactionId);
-        mv.addObject("paramMemberName",    memberName    == null ? "" : memberName);
-        mv.addObject("paramStartDate",     startDate     == null ? "" : startDate);
-        mv.addObject("paramEndDate",       endDate       == null ? "" : endDate);
+        mv.addObject("paramTransactionId", safeValue(transactionId));
+        mv.addObject("paramMemberName",    safeValue(memberName));
+        mv.addObject("paramStartDate",     safeValue(startDate));
+        mv.addObject("paramEndDate",       safeValue(endDate));
         mv.setViewName("admin/adminorderlist");
         return mv;
     }
@@ -265,12 +246,6 @@ public class AdminController {
             mv.setViewName("redirect:/admin/adminorderlist");
             return mv;
         }
-        for (Order order : orders) {
-            Book book = bookservice.getBookById(order.getBookId());
-            Member member = memberservice.selectById(order.getMemberId());
-            order.setBook(book);
-            order.setMember(member);
-        }
         mv.addObject("orders", orders);
         mv.addObject("transactionId", transactionId);
         mv.setViewName("admin/adminorderdetail");
@@ -281,5 +256,23 @@ public class AdminController {
     public String adminOrderDelete(String userId) {
         memberservice.remove(userId);
         return "redirect:/admin/adminorderlist";
+    }
+
+    private List<Book> resolveBookList(String keyword, String title, String author) {
+        if (hasText(title) || hasText(author)) {
+            return adminservice.searchBooksByTitleAuthor(title, author);
+        }
+        if (hasText(keyword)) {
+            return adminservice.searchBooks(keyword);
+        }
+        return adminservice.getBookList();
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
+    private String safeValue(String value) {
+        return value == null ? "" : value;
     }
 }
